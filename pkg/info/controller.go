@@ -22,10 +22,10 @@ func bash(cmd string) string {
 }
 
 func Controllers() []string {
-	cons := bash(`lspci | grep "^[0-9,a-z]" | grep -E 'Fusion-MPT|MegaRAID|Adaptec' | awk -F ':' '{print $NF}' | awk -F '[(|[]' '{print $1}' | awk '{gsub(/^\s+|\s+$/, "");print}'`)
-	con_slice := []string{}
-	if cons != "" {
-		con_slice = strings.Split(cons, "\n")
+	output := bash(`lspci | grep "^[0-9,a-z]" | grep -E 'Fusion-MPT|MegaRAID|Adaptec' | awk -F ':' '{print $NF}' | awk -F '[(|[]' '{print $1}' | awk '{gsub(/^\s+|\s+$/, "");print}'`)
+	conts := []string{}
+	if output != "" {
+		conts = strings.Split(output, "\n")
 	}
-	return con_slice
+	return conts
 }

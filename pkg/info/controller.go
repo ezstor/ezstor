@@ -1,31 +1,23 @@
 package info
 
 import (
-	"bytes"
-	"log"
 	"os/exec"
 	"strings"
 )
 
-func bash(cmd string) string {
-	job := exec.Command("/bin/sh", "-c", cmd)
-	var stdout, stderr bytes.Buffer
-	job.Stdout = &stdout
-	job.Stderr = &stderr
-	err := job.Run()
-	outStr := stdout.String()
+func Controllers() ([]string, error) {
+	outb, err := exec.Command(
+		"/bin/sh", "-c",
+		`lspci | grep "^[0-9,a-z]" | grep -E 'Fusion-MPT|MegaRAID|Adaptec' | awk -F ':' '{print $NF}' | awk -F '[(|[]' '{print $1}' | awk '{gsub(/^\s+|\s+$/, "");print}'`,
+	).Output()
 	if err != nil {
-		log.Printf("job.Run() failed with %s\n", err)
-		return ""
+		return nil, err
 	}
-	return outStr
-}
+	output := string(outb)
 
-func Controllers() []string {
-	output := bash(`lspci | grep "^[0-9,a-z]" | grep -E 'Fusion-MPT|MegaRAID|Adaptec' | awk -F ':' '{print $NF}' | awk -F '[(|[]' '{print $1}' | awk '{gsub(/^\s+|\s+$/, "");print}'`)
-	conts := []string{}
+	var conts []string
 	if output != "" {
-		conts = strings.Split(output, "\n")
+		conts = strings.Split(strings.Trim(output, "\n"), "\n")
 	}
-	return conts
+	return conts, nil
 }

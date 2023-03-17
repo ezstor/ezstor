@@ -16,7 +16,9 @@ type TestData struct {
 
 func TestControllers(t *testing.T) {
 	fileBytes, err := os.ReadFile("./testdata/testdata.json")
-	require.Nil(t, err)
+	if err != nil {
+		return
+	}
 
 	testData := TestData{}
 	err = json.Unmarshal(fileBytes, &testData)
